@@ -1,59 +1,64 @@
 'use client';
 
+import { useState } from 'react';
 import styles from './page.module.css';
 
+const calcTotalPoint = (array: number[], counter: number) => {
+  counter;
+  const result = array.reduce((accumulator, currentValue) => accumulator + currentValue);
+  return result + counter;
+};
+const down = (n: number) => {
+  console.log(n);
+  if (n === 0) {
+    return n;
+  } else {
+    down(n - 1);
+  }
+};
+down(10);
+const sum1 = (n: number): number => {
+  /*if (n === 0) {
+    return n;
+  } else {
+    return n + sum1(n - 1);
+  }*/
+  return n === 0 ? n : n + sum1(n - 1);
+};
+console.log('sum1=>', sum1(10));
+
+const sum2 = (n: number, m: number): number => {
+  /*if (n === m) {
+    return n;
+  } else {
+    return n + sum2(n + 1, m);
+  }*/
+  return n === m ? n : n + sum2(n + 1, m);
+};
+console.log('sum2=>', sum2(4, 10));
+const sum3 = (n: number, m: number): number => {
+  return (1 / 2) * (m + 1 - n) * (n + m);
+};
+console.log('sum3=>', sum3(4, 10));
 export default function Home() {
+  const [sampleCounter, setSampleCounter] = useState(0);
+  console.log('sampleCounter=', sampleCounter);
+  const [samplePoints, setSamplePoints] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  console.log('samplePoints=', samplePoints);
+  const clickHandler = () => {
+    setSampleCounter((sampleCounter + 1) % 14);
+    const newSamplePoints = structuredClone(samplePoints);
+    newSamplePoints[sampleCounter] += 1;
+    setSamplePoints(newSamplePoints);
+  };
+  const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
+  console.log('totalPoint=', totalPoint);
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code} style={{ backgroundColor: '#fafafa' }}>
-            src/app/page.tsx
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/learn">
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a className={styles.card} href="https://github.com/vercel/next.js/tree/master/examples">
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} />
+      <button onClick={clickHandler}>一般脳死凸戦犯</button>
     </div>
   );
 }
+
+/*userInputs + bombMap => calcBoard*/
