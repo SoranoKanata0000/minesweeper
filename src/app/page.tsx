@@ -8,38 +8,28 @@ const calcTotalPoint = (array: number[], counter: number) => {
   const result = array.reduce((accumulator, currentValue) => accumulator + currentValue);
   return result + counter;
 };
-const down = (n: number) => {
-  console.log(n);
-  if (n === 0) {
-    return n;
-  } else {
-    down(n - 1);
-  }
-};
-down(10);
-const sum1 = (n: number): number => {
-  /*if (n === 0) {
-    return n;
-  } else {
-    return n + sum1(n - 1);
-  }*/
-  return n === 0 ? n : n + sum1(n - 1);
-};
-console.log('sum1=>', sum1(10));
+// const down = (n: number) => {
+//   console.log(n);
+//   if (n === 0) {
+//     return n;
+//   } else {
+//     down(n - 1);
+//   }
+// };
+// down(10);
+// const sum1 = (n: number): number => {
+//   return n === 0 ? n : n + sum1(n - 1);
+// };
+// console.log('sum1=>', sum1(10));
 
-const sum2 = (n: number, m: number): number => {
-  /*if (n === m) {
-    return n;
-  } else {
-    return n + sum2(n + 1, m);
-  }*/
-  return n === m ? n : n + sum2(n + 1, m);
-};
-console.log('sum2=>', sum2(4, 10));
-const sum3 = (n: number, m: number): number => {
-  return (1 / 2) * (m + 1 - n) * (n + m);
-};
-console.log('sum3=>', sum3(4, 10));
+// const sum2 = (n: number, m: number): number => {
+//   return n === m ? n : n + sum2(n + 1, m);
+// };
+// console.log('sum2=>', sum2(4, 10));
+// const sum3 = (n: number, m: number): number => {
+//   return (1 / 2) * (m + 1 - n) * (n + m);
+// };
+// console.log('sum3=>', sum3(4, 10));
 export default function Home() {
   const [sampleCounter, setSampleCounter] = useState(0);
   console.log('sampleCounter=', sampleCounter);
