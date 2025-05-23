@@ -14,3 +14,21 @@
   background: url('~/src/assets/images/icons.png') no-repeat;
   border: 1px solid #000;
 }
+
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  width: 270px;
+  height: 270px;
+  background-color: #000;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: #999;
+  border: 6px outset #aaa;
+}

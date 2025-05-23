@@ -35,17 +35,38 @@ export default function Home() {
   console.log('sampleCounter=', sampleCounter);
   const [samplePoints, setSamplePoints] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   console.log('samplePoints=', samplePoints);
+  const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
+  console.log('totalPoint=', totalPoint);
+  const [board, setBoard] = useState([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ]);
   const clickHandler = () => {
     setSampleCounter((sampleCounter + 1) % 14);
     const newSamplePoints = structuredClone(samplePoints);
     newSamplePoints[sampleCounter] += 1;
     setSamplePoints(newSamplePoints);
   };
-  const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
-  console.log('totalPoint=', totalPoint);
+
   return (
     <div className={styles.container}>
-      <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} />
+      {/* <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} /> */}
+      <div className={styles.board}>
+        {board.map((row, y) =>
+          row.map((color, x) => (
+            <div className={styles.cell} key={`${x}-${y}`}>
+              a
+            </div>
+          )),
+        )}
+      </div>
       <button onClick={clickHandler}>一般脳死凸戦犯</button>
     </div>
   );
