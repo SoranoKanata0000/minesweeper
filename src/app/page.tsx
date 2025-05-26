@@ -37,7 +37,7 @@ export default function Home() {
   console.log('samplePoints=', samplePoints);
   const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
   console.log('totalPoint=', totalPoint);
-  const [board, setBoard] = useState([
+  const board = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -47,12 +47,16 @@ export default function Home() {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ]);
-  const clickHandler = () => {
-    setSampleCounter((sampleCounter + 1) % 14);
-    const newSamplePoints = structuredClone(samplePoints);
-    newSamplePoints[sampleCounter] += 1;
-    setSamplePoints(newSamplePoints);
+  ];
+  const [userInputs, setUserInputs] = useState(board);
+  const [bombBoard, setBombBoard] = useState(board);
+  const makeBombRandom = () => {};
+
+  const clickHandler = (x: number, y: number) => {
+    const newUserInputs = structuredClone(userInputs);
+    newUserInputs[y][x] = 1;
+    setUserInputs(newUserInputs);
+    makeBombRandom(); //引数は後で追加
   };
 
   return (
@@ -61,13 +65,12 @@ export default function Home() {
       <div className={styles.board}>
         {board.map((row, y) =>
           row.map((color, x) => (
-            <div className={styles.cell} key={`${x}-${y}`}>
+            <button className={styles.cell} key={`${x}-${y}`} onClick={() => clickHandler(x, y)}>
               a
-            </div>
+            </button>
           )),
         )}
       </div>
-      <button onClick={clickHandler}>一般脳死凸戦犯</button>
     </div>
   );
 }
