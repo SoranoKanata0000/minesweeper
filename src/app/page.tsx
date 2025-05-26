@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import styles from './page.module.css';
 
-const calcTotalPoint = (array: number[], counter: number) => {
-  counter;
-  const result = array.reduce((accumulator, currentValue) => accumulator + currentValue);
-  return result + counter;
-};
+// const calcTotalPoint = (array: number[], counter: number) => {
+//   counter;
+//   const result = array.reduce((accumulator, currentValue) => accumulator + currentValue);
+//   return result + counter;
+// };
 // const down = (n: number) => {
 //   console.log(n);
 //   if (n === 0) {
@@ -31,12 +31,12 @@ const calcTotalPoint = (array: number[], counter: number) => {
 // };
 // console.log('sum3=>', sum3(4, 10));
 export default function Home() {
-  const [sampleCounter, setSampleCounter] = useState(0);
-  console.log('sampleCounter=', sampleCounter);
-  const [samplePoints, setSamplePoints] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  console.log('samplePoints=', samplePoints);
-  const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
-  console.log('totalPoint=', totalPoint);
+  // const [sampleCounter, setSampleCounter] = useState(0);
+  // console.log('sampleCounter=', sampleCounter);
+  // const [samplePoints, setSamplePoints] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  // console.log('samplePoints=', samplePoints);
+  // const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
+  // console.log('totalPoint=', totalPoint);
   const board = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -50,7 +50,15 @@ export default function Home() {
   ];
   const [userInputs, setUserInputs] = useState(board);
   const [bombBoard, setBombBoard] = useState(board);
-  const makeBombRandom = () => {};
+  const makeBombRandom = () => {
+    const newBombBoard = structuredClone(bombBoard);
+    for (let y = 0; y < 10; y++) {
+      const a = Math.floor(Math.random() * 9);
+      const b = Math.floor(Math.random() * 9);
+      newBombBoard[a][b] = 11;
+    }
+    return newBombBoard;
+  };
 
   const clickHandler = (x: number, y: number) => {
     const newUserInputs = structuredClone(userInputs);
@@ -59,15 +67,19 @@ export default function Home() {
     makeBombRandom(); //引数は後で追加
   };
 
+  /*ボタンを押したらそのマスの表示が変わるようにしたい*/
+
   return (
     <div className={styles.container}>
       {/* <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} /> */}
       <div className={styles.board}>
         {board.map((row, y) =>
           row.map((color, x) => (
-            <button className={styles.cell} key={`${x}-${y}`} onClick={() => clickHandler(x, y)}>
-              a
-            </button>
+            <button
+              className={color === 0 ? styles.cell : styles.openedCell}
+              key={`${x}-${y}`}
+              onClick={() => clickHandler(x, y)}
+            />
           )),
         )}
       </div>
