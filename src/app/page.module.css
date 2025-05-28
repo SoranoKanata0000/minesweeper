@@ -25,6 +25,7 @@
 
 .cell {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   width: 30px;
@@ -35,10 +36,10 @@
 
 .openCell {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
-  background-color: #999;
   border: 1px solid #000;
 }

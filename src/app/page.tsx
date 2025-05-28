@@ -73,10 +73,10 @@ export default function Home() {
     <div className={styles.container}>
       {/* <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} /> */}
       <div className={styles.board}>
-        {board.map((row, y) =>
+        {userInputs.map((row, y) =>
           row.map((color, x) => (
             <button
-              className={color === 0 ? styles.cell : styles.openedCell}
+              className={color === 0 ? styles.cell : styles.openCell}
               key={`${x}-${y}`}
               onClick={() => clickHandler(x, y)}
             />
