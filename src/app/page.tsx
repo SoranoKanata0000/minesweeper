@@ -50,6 +50,7 @@ export default function Home() {
   ];
   const [userInputs, setUserInputs] = useState(board);
   const [bombBoard, setBombBoard] = useState(board);
+  //calcBoard
   const makeBombRandom = () => {
     const newBombBoard = structuredClone(bombBoard);
     for (let y = 0; y < 10; y++) {
@@ -67,24 +68,31 @@ export default function Home() {
     makeBombRandom(); //引数は後で追加
   };
 
-  /*ボタンを押したらそのマスの表示が変わるようにしたい*/
+  const rightClick = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
+    evt.preventDefault();
+    console.log(y, x);
+    //右クリック onContextMenu
+  };
 
   return (
     <div className={styles.container}>
       {/* <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} /> */}
-      <div className={styles.board}>
-        {userInputs.map((row, y) =>
-          row.map((color, x) => (
-            <button
-              className={color === 0 ? styles.cell : styles.openCell}
-              key={`${x}-${y}`}
-              onClick={() => clickHandler(x, y)}
-            />
-          )),
-        )}
+      <div className={styles.flame}>
+        <div className={styles.board}>
+          {userInputs.map((row, y) =>
+            row.map((value, x) => (
+              <div
+                className={value === 0 ? styles.cell : styles.openCell}
+                key={`${x}-${y}`}
+                onClick={() => clickHandler(x, y)}
+                onContextMenu={(evt) => rightClick(x, y, evt)}
+              />
+            )),
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-/*userInputs + bombMap => calcBoard*/
+//userInputs + bombMap => calcBoard

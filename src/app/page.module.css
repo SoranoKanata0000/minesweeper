@@ -15,6 +15,23 @@
   border: 1px solid #000;
 }
 
+.flame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 310px;
+  height: 390px;
+  background-color: #999;
+  border: 4px outset #aaa;
+}
+
+.horizontalFlame {
+  width: 10px;
+  height: 270px;
+  background-color: #999;
+  border: 4px outset #aaa;
+}
+
 .board {
   display: flex;
   flex-wrap: wrap;
@@ -25,21 +42,21 @@
 
 .cell {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
+  background: url('~/src/assets/images/icons.png') no-repeat;
   background-color: #999;
   border: 4px outset #aaa;
 }
 
 .openCell {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
+  background-color: #999;
   border: 1px solid #000;
 }
