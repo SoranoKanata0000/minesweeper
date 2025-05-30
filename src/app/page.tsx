@@ -50,25 +50,60 @@ export default function Home() {
   ];
   const [userInputs, setUserInputs] = useState(board);
   const [bombBoard, setBombBoard] = useState(board);
-  //calcBoard
+  const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
   const makeBombRandom = () => {
     const newBombBoard = structuredClone(bombBoard);
-    for (let y = 0; y < 10; y++) {
+    for (let i = 0; i < 10; i++) {
       const a = Math.floor(Math.random() * 9);
       const b = Math.floor(Math.random() * 9);
-      newBombBoard[a][b] = 11;
+      newBombBoard[a][b] === 0 ? (newBombBoard[a][b] = 10) : (i -= 1);
     }
-    return newBombBoard;
+    setBombBoard(newBombBoard);
   };
-
-  const clickHandler = (x: number, y: number) => {
+  const findBomb = (y:number, x:number) => {
     const newUserInputs = structuredClone(userInputs);
     newUserInputs[y][x] = 1;
+    const bmCnt = {cnt: 0}
+    const nextCnt = []
+    for (let i = -1; i<2; i++) {
+      for (let j = -1; j<2; j++) {
+        bombBoard[y+i][x+j] === 10 ? bmCnt.cnt++ : nextCnt.push([y+i, x+j])
+      }
+    }
     setUserInputs(newUserInputs);
-    makeBombRandom(); //引数は後で追加
-  };
+    bmCnt.cnt === 0 ? findBomb(nextCnt[0][0], nextCnt[0][1]) :
+  }
+  //Geminiに作ってもらったところ
+  // calculateCombinedBoard.ts または同じファイル内のどこかに定義
+  const calculateCombinedBoard = (userInputs: number[][], bombBoard: number[][]): number[][] => {
+    const combinedBoard: number[][] = [];
+    const rows = userInputs.length;
+    const cols = userInputs[0].length; // 仮に全ての行が同じ列数を持つと仮定
 
-  const rightClick = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
+    for (let y = 0; y < rows; y++) {
+      const row: number[] = [];
+      for (let x = 0; x < cols; x++) {
+        // bombBoardとuserInputsのどちらかに0以外の数値が入っている場合はその数値を入れる
+        // どちらも0の場合は0
+        row.push(userInputs[y][x] + bombBoard[y][x]);
+      }
+      combinedBoard.push(row);
+    }
+    return combinedBoard;
+  };
+  //ここまで
+  //calcBoardにuserInputsを入れる=>bombを加えていく
+  const clickHandler = (x: number, y: number) => {
+    if (!isGameStarted) {
+      makeBombRandom();
+      setIsGameStarted(true);
+    }
+    //引数は後で追加
+
+  };
+  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombBoard);
+
+  const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     console.log(y, x);
     //右クリック onContextMenu
@@ -79,13 +114,14 @@ export default function Home() {
       {/* <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} /> */}
       <div className={styles.flame}>
         <div className={styles.board}>
-          {userInputs.map((row, y) =>
+          {calcBoard.map((row, y) =>
             row.map((value, x) => (
               <div
                 className={value === 0 ? styles.cell : styles.openCell}
+                style={{ backgroundPosition: calcBoard[y][x] * -30 }}
                 key={`${x}-${y}`}
                 onClick={() => clickHandler(x, y)}
-                onContextMenu={(evt) => rightClick(x, y, evt)}
+                onContextMenu={(evt) => flagAndQuestion(x, y, evt)}
               />
             )),
           )}
@@ -94,5 +130,3 @@ export default function Home() {
     </div>
   );
 }
-
-//userInputs + bombMap => calcBoard
