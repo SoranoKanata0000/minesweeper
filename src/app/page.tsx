@@ -60,19 +60,19 @@ export default function Home() {
     }
     setBombBoard(newBombBoard);
   };
-  const findBomb = (y:number, x:number) => {
+  const findBomb = (y: number, x: number) => {
     const newUserInputs = structuredClone(userInputs);
     newUserInputs[y][x] = 1;
-    const bmCnt = {cnt: 0}
-    const nextCnt = []
-    for (let i = -1; i<2; i++) {
-      for (let j = -1; j<2; j++) {
-        bombBoard[y+i][x+j] === 10 ? bmCnt.cnt++ : nextCnt.push([y+i, x+j])
+    const bmCnt = { cnt: 0 };
+    const nextCnt = [];
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        bombBoard[y + i][x + j] === 10 ? bmCnt.cnt++ : nextCnt.push([y + i, x + j]);
       }
     }
     setUserInputs(newUserInputs);
-    bmCnt.cnt === 0 ? findBomb(nextCnt[0][0], nextCnt[0][1]) :
-  }
+    // bmCnt.cnt === 0 ? findBomb(nextCnt[0][0], nextCnt[0][1]) :
+  };
   //Geminiに作ってもらったところ
   // calculateCombinedBoard.ts または同じファイル内のどこかに定義
   const calculateCombinedBoard = (userInputs: number[][], bombBoard: number[][]): number[][] => {
@@ -99,7 +99,6 @@ export default function Home() {
       setIsGameStarted(true);
     }
     //引数は後で追加
-
   };
   const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombBoard);
 
