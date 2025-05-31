@@ -51,25 +51,29 @@ export default function Home() {
   const [userInputs, setUserInputs] = useState(board);
   const [bombBoard, setBombBoard] = useState(board);
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
-  const makeBombRandom = () => {
+  const makeBombRandom = (x: number, y: number) => {
     const newBombBoard = structuredClone(bombBoard);
     for (let i = 0; i < 10; i++) {
       const a = Math.floor(Math.random() * 9);
       const b = Math.floor(Math.random() * 9);
-      newBombBoard[a][b] === 0 ? (newBombBoard[a][b] = 10) : (i -= 1);
+      (newBombBoard[a][b] === 0 && a !== y) || b !== x ? (newBombBoard[a][b] = 11) : (i -= 1);
     }
     setBombBoard(newBombBoard);
   };
   const findBomb = (y: number, x: number) => {
     const newUserInputs = structuredClone(userInputs);
-    newUserInputs[y][x] = 1;
-    const bmCnt = { cnt: 0 };
+    // newUserInputs[y][x] = 1;
+    let bmCnt = 1;
     const nextCnt = [];
     for (let i = -1; i < 2; i++) {
       for (let j = -1; j < 2; j++) {
-        bombBoard[y + i][x + j] === 10 ? bmCnt.cnt++ : nextCnt.push([y + i, x + j]);
+        console.log(bombBoard[y + i][x + j]);
+        bombBoard[y + i][x + j] === 11 ? bmCnt++ : nextCnt.push([y + i, x + j]);
       }
     }
+    console.log('bmCnt:', bmCnt);
+    newUserInputs[y][x] = bmCnt;
+    console.log('newUserInputs[y][x]:', newUserInputs[y][x]);
     setUserInputs(newUserInputs);
     // bmCnt.cnt === 0 ? findBomb(nextCnt[0][0], nextCnt[0][1]) :
   };
@@ -78,8 +82,7 @@ export default function Home() {
   const calculateCombinedBoard = (userInputs: number[][], bombBoard: number[][]): number[][] => {
     const combinedBoard: number[][] = [];
     const rows = userInputs.length;
-    const cols = userInputs[0].length; // 仮に全ての行が同じ列数を持つと仮定
-
+    const cols = userInputs[0].length;
     for (let y = 0; y < rows; y++) {
       const row: number[] = [];
       for (let x = 0; x < cols; x++) {
@@ -92,12 +95,13 @@ export default function Home() {
     return combinedBoard;
   };
   //ここまで
-  //calcBoardにuserInputsを入れる=>bombを加えていく
   const clickHandler = (x: number, y: number) => {
     if (!isGameStarted) {
-      makeBombRandom();
+      makeBombRandom(x, y);
       setIsGameStarted(true);
     }
+    findBomb(y, x);
+    calculateCombinedBoard(userInputs, bombBoard);
     //引数は後で追加
   };
   const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombBoard);
@@ -117,7 +121,10 @@ export default function Home() {
             row.map((value, x) => (
               <div
                 className={value === 0 ? styles.cell : styles.openCell}
-                style={{ backgroundPosition: calcBoard[y][x] * -30 }}
+                style={{
+                  backgroundPosition:
+                    calcBoard[y][x] - 1 === 0 ? `transparent` : (calcBoard[y][x] - 1) * -30,
+                }}
                 key={`${x}-${y}`}
                 onClick={() => clickHandler(x, y)}
                 onContextMenu={(evt) => flagAndQuestion(x, y, evt)}
