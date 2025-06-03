@@ -63,26 +63,18 @@ export default function Home() {
     [1, 1],
   ];
   const makeBombRandom = (x: number, y: number) => {
-    const newBombMap = structuredClone(bombMap);
+    // const newBombMap = structuredClone(bombMap);
+    const bombCoordinate: number[][] = [];
     for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * 9);
       const b = Math.floor(Math.random() * 9);
-      newBombMap[a][b] === 0 && (a !== y || b !== x) ? (newBombMap[a][b] = 1) : (p -= 1);
+      a !== y || b !== x ? bombCoordinate.push([a, bombMap[a].indexOf(1)]) : (p -= 1);
     }
-    setBombMap(newBombMap);
+    // setBombMap(newBombMap);
   };
   //Geminiに作ってもらったところ
   // calculateCombinedBoard.ts または同じファイル内のどこかに定義
   const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]): number[][] => {
-    const calcBombMap: number[][] = [];
-    for (let a = 0; a < board[0].length; a++) {
-      calcBombMap.push(bombMap[a].map((x) => x * 10));
-    }
-    const bombCoordinate: number[][] = [];
-    for (let a = 0; a < board[0].length; a++) {
-      bombCoordinate.push([a, bombMap[a].indexOf(1)]);
-      console.log(bombCoordinate);
-    }
     // for (const value of bombCoordinate) {
     //   calcBombMap
     // }
