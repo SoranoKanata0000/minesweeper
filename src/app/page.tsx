@@ -63,36 +63,37 @@ export default function Home() {
     [1, 1],
   ];
   const makeBombRandom = (x: number, y: number) => {
-    // const newBombMap = structuredClone(bombMap);
-    const bombCoordinate: number[][] = [];
+    const newBombMap = structuredClone(bombMap);
     for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * 9);
       const b = Math.floor(Math.random() * 9);
-      a !== y || b !== x ? bombCoordinate.push([a, bombMap[a].indexOf(1)]) : (p -= 1);
+      if (a !== y || b !== x) {
+        newBombMap[a][b] = 11;
+      } else {
+        p -= 1;
+      }
+      for (const row of directions) {
+        if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 11) {
+          newBombMap[a + row[0]][b + row[1]] += 1;
+        }
+      }
     }
-    // setBombMap(newBombMap);
+    setBombMap(newBombMap);
   };
-  //Geminiに作ってもらったところ
-  // calculateCombinedBoard.ts または同じファイル内のどこかに定義
   const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]): number[][] => {
-    // for (const value of bombCoordinate) {
-    //   calcBombMap
-    // }
     const combinedBoard: number[][] = [];
     const rows = board.length;
     const cols = board[0].length;
     for (let y = 0; y < rows; y++) {
       const row: number[] = [];
       for (let x = 0; x < cols; x++) {
-        // bombMapとuserInputsのどちらかに0以外の数値が入っている場合はその数値を入れる
-        // どちらも0の場合は0
-        row.push(userInputs[y][x] + bombMap[y][x]);
+        row.push(bombMap[y][x]);
       }
       combinedBoard.push(row);
     }
     return combinedBoard;
   };
-  //ここまで
+  // return combinedBoard;
   const clickHandler = (x: number, y: number) => {
     console.log(y, x);
     if (!isGameStarted) {
@@ -101,17 +102,32 @@ export default function Home() {
     }
     const newUserInputs = structuredClone(userInputs);
     newUserInputs[y][x] = 1;
+    const findBomb = (y: number, x: number, oy: number, ox: number) => {
+      for (const d of directions) {
+        if (y + d[0] === oy && x + d[1] === ox) {
+          continue;
+        }
+        if (newUserInputs[y + d[0]] !== undefined) {
+          newUserInputs[y + d[0]][x + d[1]] = 1;
+          // if (calcBoard[y + d[0]][x + d[1]] === 0) {
+          //   findBomb(y + d[0], x + d[1], y, x);
+          // }
+        }
+      }
+    };
+    if (calcBoard[y][x] === 0) {
+      findBomb(y, x, NaN, NaN);
+    }
     setUserInputs(newUserInputs);
     calculateCombinedBoard(userInputs, bombMap);
     //引数は後で追加
   };
-  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
-
   const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     console.log(y, x);
     //右クリック onContextMenu
   };
+  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
 
   return (
     <div className={styles.container}>
