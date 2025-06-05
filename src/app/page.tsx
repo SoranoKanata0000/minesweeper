@@ -67,11 +67,7 @@ export default function Home() {
     for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * 9);
       const b = Math.floor(Math.random() * 9);
-<<<<<<< HEAD
       if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
-=======
-      if (a !== y || b !== x) {
->>>>>>> 63f9a66d6635b13477133befa691c8f3b23eaf25
         newBombMap[a][b] = 11;
       } else {
         p -= 1;
@@ -92,10 +88,7 @@ export default function Home() {
       const row: number[] = [];
       for (let x = 0; x < cols; x++) {
         row.push(bombMap[y][x]);
-<<<<<<< HEAD
         //現状bombMapとcalcBoardに違いがないので要修正
-=======
->>>>>>> 63f9a66d6635b13477133befa691c8f3b23eaf25
       }
       combinedBoard.push(row);
     }
@@ -110,7 +103,6 @@ export default function Home() {
     }
     const newUserInputs = structuredClone(userInputs);
     newUserInputs[y][x] = 1;
-<<<<<<< HEAD
     const findBomb = (
       y: number,
       x: number,
@@ -132,25 +124,6 @@ export default function Home() {
     };
 
     setUserInputs(findBomb(y, x, NaN, NaN, newUserInputs));
-=======
-    const findBomb = (y: number, x: number, oy: number, ox: number) => {
-      for (const d of directions) {
-        if (y + d[0] === oy && x + d[1] === ox) {
-          continue;
-        }
-        if (newUserInputs[y + d[0]] !== undefined) {
-          newUserInputs[y + d[0]][x + d[1]] = 1;
-          // if (calcBoard[y + d[0]][x + d[1]] === 0) {
-          //   findBomb(y + d[0], x + d[1], y, x);
-          // }
-        }
-      }
-    };
-    if (calcBoard[y][x] === 0) {
-      findBomb(y, x, NaN, NaN);
-    }
-    setUserInputs(newUserInputs);
->>>>>>> 63f9a66d6635b13477133befa691c8f3b23eaf25
     calculateCombinedBoard(userInputs, bombMap);
     //引数は後で追加
   };
