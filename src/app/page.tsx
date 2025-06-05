@@ -49,61 +49,90 @@ export default function Home() {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ];
   const [userInputs, setUserInputs] = useState(board);
-  const [bombBoard, setBombBoard] = useState(board);
+  const [bombMap, setBombMap] = useState(board);
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
 
+  const directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
   const makeBombRandom = (x: number, y: number) => {
-    const newBombBoard = structuredClone(bombBoard);
-    for (let i = 0; i < 10; i++) {
+    const newBombMap = structuredClone(bombMap);
+    for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * 9);
       const b = Math.floor(Math.random() * 9);
-      (newBombBoard[a][b] === 0 && a !== y) || b !== x ? (newBombBoard[a][b] = 11) : (i -= 1);
-      for (let i = -1; i < 2; i++) {
-        for (let j = -1; j < 2; j++) {
-          newBombBoard[a + i] !== undefined && newBombBoard[a + i][b + j] === 11
-            ? (newBombBoard[a + i][b + j] += 0)
-            : (newBombBoard[a + i][b + j] += 1);
+      if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
+        newBombMap[a][b] = 11;
+      } else {
+        p -= 1;
+      }
+      for (const row of directions) {
+        if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 11) {
+          newBombMap[a + row[0]][b + row[1]] += 1;
         }
       }
     }
-    setBombBoard(newBombBoard);
+    setBombMap(newBombMap);
   };
-  //Geminiに作ってもらったところ
-  // calculateCombinedBoard.ts または同じファイル内のどこかに定義
-  const calculateCombinedBoard = (userInputs: number[][], bombBoard: number[][]): number[][] => {
+  const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]): number[][] => {
     const combinedBoard: number[][] = [];
-    const rows = userInputs.length;
-    const cols = userInputs[0].length;
+    const rows = board.length;
+    const cols = board[0].length;
     for (let y = 0; y < rows; y++) {
       const row: number[] = [];
       for (let x = 0; x < cols; x++) {
-        // bombBoardとuserInputsのどちらかに0以外の数値が入っている場合はその数値を入れる
-        // どちらも0の場合は0
-        row.push(userInputs[y][x] + bombBoard[y][x]);
+        row.push(bombMap[y][x]);
+        //現状bombMapとcalcBoardに違いがないので要修正
       }
       combinedBoard.push(row);
     }
     return combinedBoard;
   };
-  //ここまで
+  // return combinedBoard;
   const clickHandler = (x: number, y: number) => {
+    console.log(y, x);
     if (!isGameStarted) {
       makeBombRandom(x, y);
       setIsGameStarted(true);
     }
     const newUserInputs = structuredClone(userInputs);
     newUserInputs[y][x] = 1;
-    setUserInputs(newUserInputs);
-    calculateCombinedBoard(userInputs, bombBoard);
+    const findBomb = (
+      y: number,
+      x: number,
+      oy: number,
+      ox: number,
+      newUserInputs: number[][],
+    ): number[][] => {
+      if (calcBoard[y][x] === 0) {
+        for (const d of directions) {
+          if (newUserInputs[y + d[0]] !== undefined && newUserInputs[y + d[0]][x + d[1]] !== 1) {
+            newUserInputs[y + d[0]][x + d[1]] = 1;
+            if (calcBoard[y + d[0]][x + d[1]] === 0) {
+              findBomb(y + d[0], x + d[1], y, x, newUserInputs);
+            }
+          }
+        }
+      }
+      return newUserInputs;
+    };
+
+    setUserInputs(findBomb(y, x, NaN, NaN, newUserInputs));
+    calculateCombinedBoard(userInputs, bombMap);
     //引数は後で追加
   };
-  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombBoard);
-
   const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     console.log(y, x);
     //右クリック onContextMenu
   };
+  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
 
   return (
     <div className={styles.container}>
@@ -113,16 +142,15 @@ export default function Home() {
           {calcBoard.map((row, y) =>
             row.map((value, x) => (
               <div
-                className={styles.openCell}
+                className={styles.cell}
                 key={`${x}-${y}`}
                 style={{
-                  backgroundPosition:
-                    calcBoard[y][x] - 1 === 0 ? `transparent` : (calcBoard[y][x] - 1) * -30,
+                  backgroundPosition: userInputs[y][x] > 0 ? (value - 1) * -30 : 30,
+                  border: userInputs[y][x] === 0 ? `4px outset #aaa` : `1px solid #000`,
                 }}
+                onClick={() => clickHandler(x, y)}
                 onContextMenu={(evt) => flagAndQuestion(x, y, evt)}
-              >
-                <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickHandler(x, y)} />
-              </div>
+              />
             )),
           )}
         </div>
@@ -130,3 +158,14 @@ export default function Home() {
     </div>
   );
 }
+
+// for (let i = -1; i < 2; i++) {
+//         for (let j = -1; j < 2; j++) {
+//           if (i === 0 && j === 0) {
+//             continue;
+//           }
+//           newBombMap[a + i] !== undefined && newBombMap[a + i][b + j] === 10
+//             ? (newBombMap[a + i][b + j] -= 0)
+//             : newBombMap[a + i] !== undefined && newBombMap[a + i][b + j]++;
+//         }
+//       }

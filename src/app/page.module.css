@@ -47,8 +47,8 @@
   justify-content: center;
   width: 30px;
   height: 30px;
+  background: url('~/src/assets/images/icons.png') no-repeat;
   background-color: #999;
-  border: 4px outset #aaa;
 }
 
 .openCell {
@@ -57,7 +57,6 @@
   justify-content: center;
   width: 30px;
   height: 30px;
-  background: url('~/src/assets/images/icons.png') no-repeat;
   background-color: #999;
   border: 1px solid #000;
 }
