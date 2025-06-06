@@ -62,7 +62,7 @@ export default function Home() {
     [1, 0],
     [1, 1],
   ];
-  const makeBombRandom = (x: number, y: number) => {
+  const makeBombRandom = (x: number, y: number): number[][] => {
     const newBombMap = structuredClone(bombMap);
     for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * board[0].length);
@@ -79,6 +79,7 @@ export default function Home() {
       }
     }
     setBombMap(newBombMap);
+    return newBombMap;
   };
   const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]) => {
     const combinedBoard: number[][] = [];
@@ -97,41 +98,51 @@ export default function Home() {
 
   const clickHandler = (x: number, y: number) => {
     console.log(y, x);
+    let currentBombMap: number[][] = bombMap;
     if (!isGameStarted) {
-      makeBombRandom(x, y);
+      const newBombMap = makeBombRandom(x, y);
+      currentBombMap = newBombMap;
       setIsGameStarted(true);
     }
     calculateCombinedBoard(userInputs, bombMap);
-    const newUserInputs = structuredClone(userInputs);
     const findBomb = (
       y: number,
       x: number,
-      oy: number,
-      ox: number,
-      newUserInputs: number[][],
+      currentUserInputs: number[][],
+      currentBombMap: number[][],
     ): number[][] => {
-      console.log('newUserInputs:', y, x);
-      newUserInputs[y][x] = 1;
-      if (calcBoard[y][x] === 0) {
-        for (const d of directions) {
-          if (
-            newUserInputs[y + d[0]] !== undefined &&
-            newUserInputs[y + d[0]][x + d[1]] !== 1 &&
-            calcBoard[y + d[0]][x + d[1]] === 0
-          ) {
-            findBomb(y + d[0], x + d[1], y, x, newUserInputs);
-          } else if (
-            newUserInputs[y + d[0]] !== undefined &&
-            newUserInputs[y + d[0]][x + d[1]] !== 1 &&
-            calcBoard[y + d[0]][x + d[1]] !== 0
-          ) {
-            newUserInputs[y + d[0]][x + d[1]] = 1;
-          }
+      const newUserInputs = structuredClone(currentUserInputs);
+
+      const openAdjacentCells = (cy: number, cx: number) => {
+        // 範囲外または既に開いているマスは処理しない
+        if (
+          cy < 0 ||
+          cy >= newUserInputs.length ||
+          cx < 0 ||
+          cx >= newUserInputs[0].length ||
+          newUserInputs[cy][cx] === 1
+        ) {
+          return;
         }
-      }
+
+        newUserInputs[cy][cx] = 1; // マスを開く
+
+        // 開いたマスが0でなければ、そこで再帰を止める
+        if (currentBombMap[cy][cx] !== 0) {
+          return;
+        }
+
+        // 0のマスなら、周囲のマスに対して再帰的に処理を行う
+        for (const d of directions) {
+          openAdjacentCells(cy + d[0], cx + d[1]);
+        }
+      };
+
+      openAdjacentCells(y, x);
       return newUserInputs;
     };
-    setUserInputs(findBomb(y, x, NaN, NaN, newUserInputs));
+    const newUserInputs = findBomb(y, x, userInputs, currentBombMap);
+    setUserInputs(newUserInputs);
 
     //引数は後で追加
   };
@@ -166,14 +177,3 @@ export default function Home() {
     </div>
   );
 }
-
-// for (let i = -1; i < 2; i++) {
-//         for (let j = -1; j < 2; j++) {
-//           if (i === 0 && j === 0) {
-//             continue;
-//           }
-//           newBombMap[a + i] !== undefined && newBombMap[a + i][b + j] === 10
-//             ? (newBombMap[a + i][b + j] -= 0)
-//             : newBombMap[a + i] !== undefined && newBombMap[a + i][b + j]++;
-//         }
-//       }
