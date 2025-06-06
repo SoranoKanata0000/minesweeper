@@ -80,7 +80,7 @@ export default function Home() {
     }
     setBombMap(newBombMap);
   };
-  const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]): number[][] => {
+  const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]) => {
     const combinedBoard: number[][] = [];
     const rows = board.length;
     const cols = board[0].length;
@@ -94,7 +94,6 @@ export default function Home() {
     }
     return combinedBoard;
   };
-  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
 
   const clickHandler = (x: number, y: number) => {
     console.log(y, x);
@@ -113,25 +112,30 @@ export default function Home() {
     ): number[][] => {
       console.log('newUserInputs:', y, x);
       newUserInputs[y][x] = 1;
-      if (bombMap[y][x] === 0) {
+      if (calcBoard[y][x] === 0) {
         for (const d of directions) {
           if (
             newUserInputs[y + d[0]] !== undefined &&
             newUserInputs[y + d[0]][x + d[1]] !== 1 &&
-            bombMap[y + d[0]][x + d[1]] === 0
+            calcBoard[y + d[0]][x + d[1]] === 0
           ) {
             findBomb(y + d[0], x + d[1], y, x, newUserInputs);
-          } else if (newUserInputs[y + d[0]] !== undefined) {
+          } else if (
+            newUserInputs[y + d[0]] !== undefined &&
+            newUserInputs[y + d[0]][x + d[1]] !== 1 &&
+            calcBoard[y + d[0]][x + d[1]] !== 0
+          ) {
             newUserInputs[y + d[0]][x + d[1]] = 1;
           }
         }
       }
       return newUserInputs;
     };
-
     setUserInputs(findBomb(y, x, NaN, NaN, newUserInputs));
+
     //引数は後で追加
   };
+  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
   const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     console.log(y, x);
