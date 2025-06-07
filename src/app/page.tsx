@@ -67,10 +67,10 @@ export default function Home() {
     for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * board[0].length);
       const b = Math.floor(Math.random() * board[0].length);
-      if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
+      if ((a !== y || b !== x) && newBombMap[a][b] !== 10) {
         newBombMap[a][b] = 11;
         for (const row of directions) {
-          if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 11) {
+          if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 10) {
             newBombMap[a + row[0]][b + row[1]] += 1;
           }
         }
@@ -147,10 +147,29 @@ export default function Home() {
     //引数は後で追加
   };
   const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
+
+  const nextStateMap: { [key: number]: number } = {
+    0: 8, // 未開封(0) -> 旗(2)
+    8: 7, // 旗(2) -> ？(3)
+    7: 0, // ？(3) -> 未開封(0)
+  };
+
   const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     console.log(y, x);
     //右クリック onContextMenu
+    const newUserInputs = structuredClone(userInputs);
+    const currentStatus = newUserInputs[y][x];
+
+    // 開封済みのマス(1)は何もしない
+    if (currentStatus === 1) {
+      return;
+    }
+
+    // マップから次の状態を取得する。マップにキーがなければ元の値を維持する
+    newUserInputs[y][x] = nextStateMap[currentStatus] ?? currentStatus;
+
+    setUserInputs(newUserInputs);
   };
 
   return (
@@ -165,7 +184,7 @@ export default function Home() {
                 key={`${x}-${y}`}
                 style={{
                   backgroundPosition: userInputs[y][x] > 0 ? (value - 1) * -30 : 30,
-                  border: userInputs[y][x] === 0 ? `4px outset #aaa` : `1px solid #000`,
+                  border: userInputs[y][x] === 1 ? `1px solid #000` : `4px outset #aaa`,
                 }}
                 onClick={() => clickHandler(x, y)}
                 onContextMenu={(evt) => flagAndQuestion(x, y, evt)}
