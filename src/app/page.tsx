@@ -67,10 +67,10 @@ export default function Home() {
     for (let p = 0; p < 10; p++) {
       const a = Math.floor(Math.random() * board[0].length);
       const b = Math.floor(Math.random() * board[0].length);
-      if ((a !== y || b !== x) && newBombMap[a][b] !== 10) {
+      if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
         newBombMap[a][b] = 11;
         for (const row of directions) {
-          if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 10) {
+          if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 11) {
             newBombMap[a + row[0]][b + row[1]] += 1;
           }
         }
