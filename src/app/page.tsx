@@ -81,19 +81,8 @@ export default function Home() {
     setBombMap(newBombMap);
     return newBombMap;
   };
-  const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]) => {
-    const combinedBoard: number[][] = [];
-    const rows = board.length;
-    const cols = board[0].length;
-    for (let y = 0; y < rows; y++) {
-      const row: number[] = [];
-      for (let x = 0; x < cols; x++) {
-        row.push(bombMap[y][x]);
-        //現状bombMapとcalcBoardに違いがないので要修正
-      }
-      combinedBoard.push(row);
-    }
-    return combinedBoard;
+  const calculateCombinedBoard = (userInputs: number[][], bombMap: number[][]): number[][][] => {
+    return userInputs.map((row, y) => row.map((userInput, x) => [userInput, bombMap[y][x]]));
   };
 
   const clickHandler = (x: number, y: number) => {
@@ -146,7 +135,7 @@ export default function Home() {
 
     //引数は後で追加
   };
-  const calcBoard: number[][] = calculateCombinedBoard(userInputs, bombMap);
+  const calcBoard: number[][][] = calculateCombinedBoard(userInputs, bombMap);
 
   const nextStateMap: { [key: number]: number } = {
     0: 8, // 未開封(0) -> 旗(2)
@@ -161,12 +150,6 @@ export default function Home() {
     const newUserInputs = structuredClone(userInputs);
     const currentStatus = newUserInputs[y][x];
 
-    // 開封済みのマス(1)は何もしない
-    if (currentStatus === 1) {
-      return;
-    }
-
-    // マップから次の状態を取得する。マップにキーがなければ元の値を維持する
     newUserInputs[y][x] = nextStateMap[currentStatus] ?? currentStatus;
 
     setUserInputs(newUserInputs);
@@ -174,22 +157,43 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      {/* <div className={styles.sampleCell} style={{ backgroundPosition: sampleCounter * -30 }} /> */}
       <div className={styles.flame}>
         <div className={styles.board}>
           {calcBoard.map((row, y) =>
-            row.map((value, x) => (
-              <div
-                className={styles.cell}
-                key={`${x}-${y}`}
-                style={{
-                  backgroundPosition: userInputs[y][x] > 0 ? (value - 1) * -30 : 30,
-                  border: userInputs[y][x] === 1 ? `1px solid #000` : `4px outset #aaa`,
-                }}
-                onClick={() => clickHandler(x, y)}
-                onContextMenu={(evt) => flagAndQuestion(x, y, evt)}
-              />
-            )),
+            row.map((cellData, x) => {
+              const userInput = cellData[0];
+              const bombValue = cellData[1];
+
+              return (
+                <div
+                  className={styles.cell}
+                  key={`${x}-${y}`}
+                  style={{
+                    backgroundPosition: (() => {
+                      // userInputの値に応じて表示を切り替える
+                      if (userInput === 1) {
+                        // 1: 開封済み
+                        // bombValueを使って数字の画像位置を決める
+                        return `${(bombValue - 1) * -30}px`;
+                      }
+                      if (userInput === 8) {
+                        // 8: 旗
+                        return '-270px';
+                      }
+                      if (userInput === 7) {
+                        // 7: ？
+                        return '-240px';
+                      }
+                      // 0: 未開封
+                      return '30px';
+                    })(),
+                    border: userInput === 1 ? '1px solid #000' : '4px outset #aaa',
+                  }}
+                  onClick={() => clickHandler(x, y)}
+                  onContextMenu={(evt) => flagAndQuestion(y, x, evt)}
+                />
+              );
+            }),
           )}
         </div>
       </div>
