@@ -17,6 +17,7 @@
 
 .flame {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 310px;
@@ -26,10 +27,19 @@
 }
 
 .horizontalFlame {
-  width: 10px;
-  height: 270px;
+  width: 270px;
+  height: 15px;
   background-color: #999;
-  border: 4px outset #aaa;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 278px;
+  height: 60px;
+  background-color: #999;
+  border: 4px inset #aaa;
 }
 
 .board {

@@ -158,12 +158,13 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <div className={styles.flame}>
+        <div className={styles.info} />
+        <div className={styles.horizontalFlame} />
         <div className={styles.board}>
           {calcBoard.map((row, y) =>
             row.map((cellData, x) => {
               const userInput = cellData[0];
               const bombValue = cellData[1];
-
               return (
                 <div
                   className={styles.cell}
@@ -178,16 +179,16 @@ export default function Home() {
                       }
                       if (userInput === 8) {
                         // 8: 旗
-                        return '-270px';
+                        return '-272px';
                       }
                       if (userInput === 7) {
                         // 7: ？
-                        return '-240px';
+                        return '-242px';
                       }
                       // 0: 未開封
                       return '30px';
                     })(),
-                    border: userInput === 1 ? '1px solid #000' : '4px outset #aaa',
+                    border: userInput === 1 ? '1px solid #000' : '3px outset #aaa',
                   }}
                   onClick={() => clickHandler(x, y)}
                   onContextMenu={(evt) => flagAndQuestion(y, x, evt)}
