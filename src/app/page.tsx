@@ -3,40 +3,7 @@
 import { useState } from 'react';
 import styles from './page.module.css';
 
-// const calcTotalPoint = (array: number[], counter: number) => {
-//   counter;
-//   const result = array.reduce((accumulator, currentValue) => accumulator + currentValue);
-//   return result + counter;
-// };
-// const down = (n: number) => {
-//   console.log(n);
-//   if (n === 0) {
-//     return n;
-//   } else {
-//     down(n - 1);
-//   }
-// };
-// down(10);
-// const sum1 = (n: number): number => {
-//   return n === 0 ? n : n + sum1(n - 1);
-// };
-// console.log('sum1=>', sum1(10));
-
-// const sum2 = (n: number, m: number): number => {
-//   return n === m ? n : n + sum2(n + 1, m);
-// };
-// console.log('sum2=>', sum2(4, 10));
-// const sum3 = (n: number, m: number): number => {
-//   return (1 / 2) * (m + 1 - n) * (n + m);
-// };
-// console.log('sum3=>', sum3(4, 10));
 export default function Home() {
-  // const [sampleCounter, setSampleCounter] = useState(0);
-  // console.log('sampleCounter=', sampleCounter);
-  // const [samplePoints, setSamplePoints] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  // console.log('samplePoints=', samplePoints);
-  // const totalPoint = calcTotalPoint(samplePoints, sampleCounter);
-  // console.log('totalPoint=', totalPoint);
   const board = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -65,7 +32,7 @@ export default function Home() {
   const makeBombRandom = (x: number, y: number): number[][] => {
     const newBombMap = structuredClone(bombMap);
     for (let p = 0; p < 10; p++) {
-      const a = Math.floor(Math.random() * board[0].length);
+      const a = Math.floor(Math.random() * board.length);
       const b = Math.floor(Math.random() * board[0].length);
       if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
         newBombMap[a][b] = 11;
@@ -132,8 +99,6 @@ export default function Home() {
     };
     const newUserInputs = findBomb(y, x, userInputs, currentBombMap);
     setUserInputs(newUserInputs);
-
-    //引数は後で追加
   };
   const calcBoard: number[][][] = calculateCombinedBoard(userInputs, bombMap);
 
