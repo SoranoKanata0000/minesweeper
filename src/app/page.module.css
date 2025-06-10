@@ -42,6 +42,45 @@
   border: 4px inset #aaa;
 }
 
+.flagCounter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 42px;
+  background-color: aquamarine;
+  border: 3px inset #aaa;
+}
+
+.space {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background-color: #999;
+}
+
+.infoButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background-color: #fff;
+  border: 3px inset #aaa;
+}
+
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 42px;
+  background-color: aquamarine;
+  border: 3px inset #aaa;
+}
+
 .board {
   display: flex;
   flex-wrap: wrap;

@@ -158,7 +158,13 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <div className={styles.flame}>
-        <div className={styles.info} />
+        <div className={styles.info}>
+          <div className={styles.flagCounter} />
+          <div className={styles.space} />
+          <button className={styles.infoButton} />
+          <div className={styles.space} />
+          <div className={styles.timer} />
+        </div>
         <div className={styles.horizontalFlame} />
         <div className={styles.board}>
           {calcBoard.map((row, y) =>
