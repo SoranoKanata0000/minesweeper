@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -19,6 +19,27 @@ export default function Home() {
   const [bombMap, setBombMap] = useState(board);
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
 
+  const [time, setTime] = useState(0);
+  useEffect(() => {
+    let timerId: NodeJS.Timeout | undefined;
+
+    // isGameStartedがtrueの場合のみタイマーをセット
+    if (isGameStarted) {
+      timerId = setInterval(() => {
+        // 1秒ごとに時間を1増やす
+        // 必ず「関数を渡す形式」で更新する（これにより常に最新のtimeを参照できる）
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+    }
+
+    // クリーンアップ関数
+    return () => {
+      // timerIdが存在すれば（タイマーがセットされていれば）クリアする
+      if (timerId) {
+        clearInterval(timerId);
+      }
+    };
+  }, [isGameStarted]); // isGameStartedを依存配列に指定
   const directions = [
     [-1, -1],
     [-1, 0],
@@ -128,7 +149,7 @@ export default function Home() {
           <div className={styles.space} />
           <button className={styles.infoButton} />
           <div className={styles.space} />
-          <div className={styles.timer} />
+          <div className={styles.timer}>{time}</div>
         </div>
         <div className={styles.horizontalFlame} />
         <div className={styles.board}>
