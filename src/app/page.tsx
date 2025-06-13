@@ -4,23 +4,32 @@ import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
 export default function Home() {
-  const board = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ];
-  const [userInputs, setUserInputs] = useState(board);
-  const [bombMap, setBombMap] = useState(board);
-  // 'isGameStarted' の代わりに、より詳細なゲーム状態を管理するstateを導入
+  const difficultySettings = {
+    easy: { width: 9, height: 9, bombs: 10 },
+    medium: { width: 16, height: 16, bombs: 40 },
+    hard: { width: 30, height: 16, bombs: 99 },
+  };
+
+  type Difficulty = keyof typeof difficultySettings; // 'easy' | 'medium' | 'hard'
+
+  const createBoard = (height: number, width: number): number[][] => {
+    return Array.from({ length: height }, () => Array.from({ length: width }, () => 0));
+  };
+
+  // useStateのセクションを修正
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+
+  const initialSettings = difficultySettings[difficulty];
+  const [userInputs, setUserInputs] = useState(
+    createBoard(initialSettings.height, initialSettings.width),
+  );
+  const [bombMap, setBombMap] = useState(
+    createBoard(initialSettings.height, initialSettings.width),
+  );
   const [gameStatus, setGameStatus] = useState<'ready' | 'playing' | 'cleared' | 'gameOver'>(
     'ready',
   );
+
   const [time, setTime] = useState(0);
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
@@ -46,18 +55,19 @@ export default function Home() {
     [1, 0],
     [1, 1],
   ];
-  const makeBombRandom = (x: number, y: number): number[][] => {
-    const newBombMap = structuredClone(bombMap);
-    for (let p = 0; p < 10; p++) {
-      const a = Math.floor(Math.random() * board.length);
-      const b = Math.floor(Math.random() * board[0].length);
+  const makeBombRandom = (x: number, y: number, bombs: number): number[][] => {
+    const currentSettings = difficultySettings[difficulty];
+    const newBombMap = createBoard(currentSettings.height, currentSettings.width);
+    for (let p = 0; p < bombs; p++) {
+      const a = Math.floor(Math.random() * currentSettings.height);
+      const b = Math.floor(Math.random() * currentSettings.width);
       if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
         newBombMap[a][b] = 11;
         for (const row of directions) {
           if (
             newBombMap[a + row[0]] !== undefined &&
             newBombMap[a + row[0]][b + row[1]] !== 11 &&
-            b + row[1] < board[0].length
+            b + row[1] < currentSettings.width
           ) {
             newBombMap[a + row[0]][b + row[1]] += 1;
           }
@@ -81,7 +91,8 @@ export default function Home() {
     let currentBombMap: number[][] = bombMap;
     // 最初のクリック時の処理
     if (gameStatus === 'ready') {
-      const newBombMap = makeBombRandom(x, y);
+      const currentSettings = difficultySettings[difficulty];
+      const newBombMap = makeBombRandom(x, y, currentSettings.bombs);
       currentBombMap = newBombMap;
       setGameStatus('playing'); // ゲーム状態を 'playing' に更新
     }
@@ -150,9 +161,9 @@ export default function Home() {
 
     // 開かれていないマスの数を数える
     const unopenedCells = newInputs.flat().filter((input) => input !== 1).length;
-
+    const currentBombCount = difficultySettings[difficulty].bombs;
     // 開かれていないマスの数と爆弾の数が同じならゲームクリア
-    if (unopenedCells === 10) {
+    if (unopenedCells === currentBombCount) {
       // 10は爆弾の数
       return 'cleared';
     }
@@ -162,7 +173,7 @@ export default function Home() {
   const calcBoard: number[][][] = calculateCombinedBoard(userInputs, bombMap);
 
   const flagsPlaced = userInputs.flat().filter((userInput) => userInput === 8).length;
-  const bombsRemaining = 10 - flagsPlaced;
+  const bombsRemaining = difficultySettings[difficulty].bombs - flagsPlaced;
 
   const nextStateMap: { [key: number]: number } = {
     0: 8, // 未開封(0) -> 旗(2)
@@ -181,20 +192,49 @@ export default function Home() {
 
     setUserInputs(newUserInputs);
   };
+  const handleDifficultyChange = (newDifficulty: Difficulty) => {
+    const newSettings = difficultySettings[newDifficulty];
+    const newBoard = createBoard(newSettings.height, newSettings.width);
+
+    setDifficulty(newDifficulty);
+    setUserInputs(newBoard);
+    setBombMap(newBoard);
+    setGameStatus('ready');
+    setTime(0);
+  };
   const resetHandler = () => {
-    console.log('reset');
-    setUserInputs(board);
-    setBombMap(board);
+    const currentSettings = difficultySettings[difficulty];
+    const newBoard = createBoard(currentSettings.height, currentSettings.width);
+
+    setUserInputs(newBoard);
+    setBombMap(newBoard);
     setGameStatus('ready');
     setTime(0);
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.flame}>
-        <div className={styles.info}>
+      <div>
+        <button onClick={() => handleDifficultyChange('easy')}>初級</button>
+        <button onClick={() => handleDifficultyChange('medium')}>中級</button>
+        <button onClick={() => handleDifficultyChange('hard')}>上級</button>
+      </div>
+      <div
+        className={styles.flame}
+        style={{
+          width: initialSettings.width * 30 + 36,
+          height: initialSettings.height * 30 + 112,
+        }}
+      >
+        <div
+          className={styles.info}
+          style={{
+            width: initialSettings.width * 30 + 8,
+            padding: `10px`,
+          }}
+        >
           <div className={styles.flagCounter}>{bombsRemaining}</div>
-          <div className={styles.space} />
+
           <button
             className={styles.infoButton}
             style={{
@@ -212,11 +252,22 @@ export default function Home() {
             }}
             onClick={() => resetHandler()}
           />
-          <div className={styles.space} />
+
           <div className={styles.timer}>{time}</div>
         </div>
-        <div className={styles.horizontalFlame} />
-        <div className={styles.board}>
+        <div
+          className={styles.horizontalFlame}
+          style={{
+            width: initialSettings.width * 30,
+          }}
+        />
+        <div
+          className={styles.board}
+          style={{
+            width: initialSettings.width * 30 + 8,
+            height: initialSettings.height * 30 + 8,
+          }}
+        >
           {calcBoard.map((row, y) =>
             row.map((cellData, x) => {
               const userInput = cellData[0];

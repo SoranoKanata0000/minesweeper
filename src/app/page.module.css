@@ -35,7 +35,7 @@
 .info {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 278px;
   height: 60px;
   background-color: #999;
