@@ -181,6 +181,13 @@ export default function Home() {
 
     setUserInputs(newUserInputs);
   };
+  const resetHandler = () => {
+    console.log('reset');
+    setUserInputs(board);
+    setBombMap(board);
+    setGameStatus('ready');
+    setTime(0);
+  };
 
   return (
     <div className={styles.container}>
@@ -188,7 +195,23 @@ export default function Home() {
         <div className={styles.info}>
           <div className={styles.flagCounter}>{bombsRemaining}</div>
           <div className={styles.space} />
-          <button className={styles.infoButton} style={{ backgroundPosition: `-329px` }} />
+          <button
+            className={styles.infoButton}
+            style={{
+              backgroundPosition: (() => {
+                if (checkGameStatus(userInputs, bombMap) === 'playing') {
+                  return `-329px`;
+                }
+                if (checkGameStatus(userInputs, bombMap) === 'gameOver') {
+                  return `-389px`;
+                }
+                if (checkGameStatus(userInputs, bombMap) === 'cleared') {
+                  return `-359px`;
+                }
+              })(),
+            }}
+            onClick={() => resetHandler()}
+          />
           <div className={styles.space} />
           <div className={styles.timer}>{time}</div>
         </div>
@@ -234,4 +257,3 @@ export default function Home() {
     </div>
   );
 }
-//くぁｗせｄｒｆｔｇｙふじこｌｐ
