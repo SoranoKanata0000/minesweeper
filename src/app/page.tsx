@@ -85,7 +85,12 @@ export default function Home() {
 
   const clickHandler = (x: number, y: number) => {
     console.log(y, x);
-    if (gameStatus === 'cleared' || gameStatus === 'gameOver') {
+    if (
+      gameStatus === 'cleared' ||
+      gameStatus === 'gameOver' ||
+      userInputs[y][x] === 8 ||
+      userInputs[y][x] === 7
+    ) {
       return;
     }
     let currentBombMap: number[][] = bombMap;
@@ -103,14 +108,28 @@ export default function Home() {
     const newGameStatus = checkGameStatus(newUserInputs, currentBombMap);
 
     if (newGameStatus === 'gameOver') {
+      currentBombMap[y][x] = -1;
       alert('Game Over!');
       setGameStatus('gameOver');
-    } else if (newGameStatus === 'cleared') {
+
+      const finalBoard = newUserInputs.map((row, y) =>
+        row.map((userInput, x) => {
+          if (currentBombMap[y][x] === 11) {
+            return 1;
+          }
+          return userInput;
+        }),
+      );
+
+      setUserInputs(finalBoard);
+      return;
+    }
+    setUserInputs(newUserInputs);
+
+    if (newGameStatus === 'cleared') {
       alert('Game Clear!');
       setGameStatus('cleared');
     }
-
-    setUserInputs(newUserInputs);
   };
   const findBomb = (
     y: number,
@@ -184,6 +203,9 @@ export default function Home() {
   const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
     console.log(y, x);
+    if (gameStatus === 'cleared' || gameStatus === 'gameOver') {
+      return;
+    }
     //右クリック onContextMenu
     const newUserInputs = structuredClone(userInputs);
     const currentStatus = newUserInputs[y][x];
@@ -277,24 +299,35 @@ export default function Home() {
                   className={styles.cell}
                   key={`${x}-${y}`}
                   style={{
+                    backgroundSize:
+                      userInputs[y][x] === 7 || userInputs[y][x] === 8
+                        ? `325px 23px`
+                        : `420px 30px`,
                     backgroundPosition: (() => {
+                      if (bombMap[y][x] === -1) {
+                        return `-300px`;
+                      }
                       // userInputの値に応じて表示を切り替える
-                      if (userInput === 1) {
+                      else if (userInput === 1) {
                         // 1: 開封済み
                         // bombValueを使って数字の画像位置を決める
                         return `${(bombValue - 1) * -30}px`;
-                      }
-                      if (userInput === 8) {
+                      } else if (userInput === 8) {
                         // 8: 旗
-                        return '-272px';
-                      }
-                      if (userInput === 7) {
+                        return '-207px';
+                      } else if (userInput === 7) {
                         // 7: ？
-                        return '-242px';
+                        return '-185px';
                       }
                       // 0: 未開封
                       return '30px';
                     })(),
+                    backgroundColor:
+                      userInputs[y][x] === 1 && bombMap[y][x] === 11
+                        ? `#999`
+                        : bombMap[y][x] === -1
+                          ? `#f00`
+                          : `#999`,
                     border: userInput === 1 ? '1px solid #000' : '3px outset #aaa',
                   }}
                   onClick={() => clickHandler(x, y)}
