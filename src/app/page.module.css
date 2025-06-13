@@ -67,8 +67,13 @@
   justify-content: center;
   width: 42px;
   height: 42px;
+  background: url('~/src/assets/images/icons.png') no-repeat;
   background-color: #fff;
-  border: 3px inset #aaa;
+  border: 6px outset #aaa;
+}
+
+.infoButton:active {
+  border-style: inset;
 }
 
 .timer {

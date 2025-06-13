@@ -17,29 +17,25 @@ export default function Home() {
   ];
   const [userInputs, setUserInputs] = useState(board);
   const [bombMap, setBombMap] = useState(board);
-  const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
-
+  // 'isGameStarted' の代わりに、より詳細なゲーム状態を管理するstateを導入
+  const [gameStatus, setGameStatus] = useState<'ready' | 'playing' | 'cleared' | 'gameOver'>(
+    'ready',
+  );
   const [time, setTime] = useState(0);
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
-
-    // isGameStartedがtrueの場合のみタイマーをセット
-    if (isGameStarted) {
+    // gameStatus が 'playing' の間だけタイマーを動かす
+    if (gameStatus === 'playing') {
       timerId = setInterval(() => {
-        // 1秒ごとに時間を1増やす
-        // 必ず「関数を渡す形式」で更新する（これにより常に最新のtimeを参照できる）
         setTime((prevTime) => prevTime + 1);
       }, 1000);
     }
-
-    // クリーンアップ関数
     return () => {
-      // timerIdが存在すれば（タイマーがセットされていれば）クリアする
       if (timerId) {
         clearInterval(timerId);
       }
     };
-  }, [isGameStarted]); // isGameStartedを依存配列に指定
+  }, [gameStatus]);
   const directions = [
     [-1, -1],
     [-1, 0],
@@ -58,7 +54,11 @@ export default function Home() {
       if ((a !== y || b !== x) && newBombMap[a][b] !== 11) {
         newBombMap[a][b] = 11;
         for (const row of directions) {
-          if (newBombMap[a + row[0]] !== undefined && newBombMap[a + row[0]][b + row[1]] !== 11) {
+          if (
+            newBombMap[a + row[0]] !== undefined &&
+            newBombMap[a + row[0]][b + row[1]] !== 11 &&
+            b + row[1] < board[0].length
+          ) {
             newBombMap[a + row[0]][b + row[1]] += 1;
           }
         }
@@ -75,53 +75,94 @@ export default function Home() {
 
   const clickHandler = (x: number, y: number) => {
     console.log(y, x);
+    if (gameStatus === 'cleared' || gameStatus === 'gameOver') {
+      return;
+    }
     let currentBombMap: number[][] = bombMap;
-    if (!isGameStarted) {
+    // 最初のクリック時の処理
+    if (gameStatus === 'ready') {
       const newBombMap = makeBombRandom(x, y);
       currentBombMap = newBombMap;
-      setIsGameStarted(true);
+      setGameStatus('playing'); // ゲーム状態を 'playing' に更新
     }
-    calculateCombinedBoard(userInputs, bombMap);
-    const findBomb = (
-      y: number,
-      x: number,
-      currentUserInputs: number[][],
-      currentBombMap: number[][],
-    ): number[][] => {
-      const newUserInputs = structuredClone(currentUserInputs);
+    console.log(currentBombMap);
 
-      const openAdjacentCells = (cy: number, cx: number) => {
-        // 範囲外または既に開いているマスは処理しない
-        if (
-          cy < 0 ||
-          cy >= newUserInputs.length ||
-          cx < 0 ||
-          cx >= newUserInputs[0].length ||
-          newUserInputs[cy][cx] === 1
-        ) {
-          return;
-        }
-
-        newUserInputs[cy][cx] = 1; // マスを開く
-
-        // 開いたマスが0でなければ、そこで再帰を止める
-        if (currentBombMap[cy][cx] !== 0) {
-          return;
-        }
-
-        // 0のマスなら、周囲のマスに対して再帰的に処理を行う
-        for (const d of directions) {
-          openAdjacentCells(cy + d[0], cx + d[1]);
-        }
-      };
-
-      openAdjacentCells(y, x);
-      return newUserInputs;
-    };
     const newUserInputs = findBomb(y, x, userInputs, currentBombMap);
+
+    const newGameStatus = checkGameStatus(newUserInputs, currentBombMap);
+
+    if (newGameStatus === 'gameOver') {
+      alert('Game Over!');
+      setGameStatus('gameOver');
+    } else if (newGameStatus === 'cleared') {
+      alert('Game Clear!');
+      setGameStatus('cleared');
+    }
+
     setUserInputs(newUserInputs);
   };
+  const findBomb = (
+    y: number,
+    x: number,
+    currentUserInputs: number[][],
+    currentBombMap: number[][],
+  ): number[][] => {
+    const newUserInputs = structuredClone(currentUserInputs);
+
+    const openAdjacentCells = (cy: number, cx: number) => {
+      // 範囲外または既に開いているマスは処理しない
+      if (
+        cy < 0 ||
+        cy >= newUserInputs.length ||
+        cx < 0 ||
+        cx >= newUserInputs[0].length ||
+        newUserInputs[cy][cx] === 1
+      ) {
+        return;
+      }
+
+      newUserInputs[cy][cx] = 1; // マスを開く
+
+      // 開いたマスが0でなければ、そこで再帰を止める
+      if (currentBombMap[cy][cx] !== 0) {
+        return;
+      }
+
+      // 0のマスなら、周囲のマスに対して再帰的に処理を行う
+      for (const d of directions) {
+        openAdjacentCells(cy + d[0], cx + d[1]);
+      }
+    };
+    openAdjacentCells(y, x);
+    return newUserInputs;
+  };
+
+  const checkGameStatus = (
+    newInputs: number[][],
+    bombMap: number[][],
+  ): 'cleared' | 'gameOver' | 'playing' => {
+    const isGameOver = newInputs.flat().some((input, i) => input === 1 && bombMap.flat()[i] === 11);
+    console.log(isGameOver);
+
+    if (isGameOver) {
+      return 'gameOver';
+    }
+
+    // 開かれていないマスの数を数える
+    const unopenedCells = newInputs.flat().filter((input) => input !== 1).length;
+
+    // 開かれていないマスの数と爆弾の数が同じならゲームクリア
+    if (unopenedCells === 10) {
+      // 10は爆弾の数
+      return 'cleared';
+    }
+
+    return 'playing';
+  };
   const calcBoard: number[][][] = calculateCombinedBoard(userInputs, bombMap);
+
+  const flagsPlaced = userInputs.flat().filter((userInput) => userInput === 8).length;
+  const bombsRemaining = 10 - flagsPlaced;
 
   const nextStateMap: { [key: number]: number } = {
     0: 8, // 未開封(0) -> 旗(2)
@@ -145,9 +186,9 @@ export default function Home() {
     <div className={styles.container}>
       <div className={styles.flame}>
         <div className={styles.info}>
-          <div className={styles.flagCounter} />
+          <div className={styles.flagCounter}>{bombsRemaining}</div>
           <div className={styles.space} />
-          <button className={styles.infoButton} />
+          <button className={styles.infoButton} style={{ backgroundPosition: `-329px` }} />
           <div className={styles.space} />
           <div className={styles.timer}>{time}</div>
         </div>
