@@ -8,18 +8,26 @@ export default function Home() {
     easy: { width: 9, height: 9, bombs: 10 },
     medium: { width: 16, height: 16, bombs: 40 },
     hard: { width: 30, height: 16, bombs: 99 },
+    custom: { width: 9, height: 9, bombs: 10 },
   };
 
-  type Difficulty = keyof typeof difficultySettings; // 'easy' | 'medium' | 'hard'
+  type Difficulty = keyof typeof difficultySettings;
 
   const createBoard = (height: number, width: number): number[][] => {
     return Array.from({ length: height }, () => Array.from({ length: width }, () => 0));
   };
 
-  // useStateのセクションを修正
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
 
+  const [customSettings, setCustomSettings] = useState({
+    height: 10,
+    width: 10,
+    bombs: 15,
+  });
+
   const initialSettings = difficultySettings[difficulty];
+  const settings = difficulty === 'custom' ? customSettings : difficultySettings[difficulty];
+
   const [userInputs, setUserInputs] = useState(
     createBoard(initialSettings.height, initialSettings.width),
   );
@@ -56,7 +64,7 @@ export default function Home() {
     [1, 1],
   ];
   const makeBombRandom = (x: number, y: number, bombs: number): number[][] => {
-    const currentSettings = difficultySettings[difficulty];
+    const currentSettings = settings;
     const newBombMap = createBoard(currentSettings.height, currentSettings.width);
     for (let p = 0; p < bombs; p++) {
       const a = Math.floor(Math.random() * currentSettings.height);
@@ -96,7 +104,7 @@ export default function Home() {
     let currentBombMap: number[][] = bombMap;
     // 最初のクリック時の処理
     if (gameStatus === 'ready') {
-      const currentSettings = difficultySettings[difficulty];
+      const currentSettings = settings;
       const newBombMap = makeBombRandom(x, y, currentSettings.bombs);
       currentBombMap = newBombMap;
       setGameStatus('playing'); // ゲーム状態を 'playing' に更新
@@ -180,7 +188,7 @@ export default function Home() {
 
     // 開かれていないマスの数を数える
     const unopenedCells = newInputs.flat().filter((input) => input !== 1).length;
-    const currentBombCount = difficultySettings[difficulty].bombs;
+    const currentBombCount = settings.bombs;
     // 開かれていないマスの数と爆弾の数が同じならゲームクリア
     if (unopenedCells === currentBombCount) {
       // 10は爆弾の数
@@ -192,7 +200,7 @@ export default function Home() {
   const calcBoard: number[][][] = calculateCombinedBoard(userInputs, bombMap);
 
   const flagsPlaced = userInputs.flat().filter((userInput) => userInput === 8).length;
-  const bombsRemaining = difficultySettings[difficulty].bombs - flagsPlaced;
+  const bombsRemaining = settings.bombs - flagsPlaced;
 
   const nextStateMap: { [key: number]: number } = {
     0: 8, // 未開封(0) -> 旗(2)
@@ -225,7 +233,7 @@ export default function Home() {
     setTime(0);
   };
   const resetHandler = () => {
-    const currentSettings = difficultySettings[difficulty];
+    const currentSettings = difficulty === 'custom' ? customSettings : settings;
     const newBoard = createBoard(currentSettings.height, currentSettings.width);
 
     setUserInputs(newBoard);
@@ -240,7 +248,44 @@ export default function Home() {
         <button onClick={() => handleDifficultyChange('easy')}>初級</button>
         <button onClick={() => handleDifficultyChange('medium')}>中級</button>
         <button onClick={() => handleDifficultyChange('hard')}>上級</button>
+        <button onClick={() => handleDifficultyChange('custom')}>カスタム</button>
       </div>
+      {difficulty === 'custom' && (
+        <div className={styles.customSettings}>
+          <div>
+            <label>高さ:</label>
+            <input
+              type="number"
+              value={customSettings.height}
+              onChange={(e) =>
+                setCustomSettings((prev) => ({ ...prev, height: Number(e.target.value) }))
+              }
+            />
+          </div>
+          <div>
+            <label>幅:</label>
+            <input
+              type="number"
+              value={customSettings.width}
+              onChange={(e) =>
+                setCustomSettings((prev) => ({ ...prev, width: Number(e.target.value) }))
+              }
+            />
+          </div>
+          <div>
+            <label>爆弾:</label>
+            <input
+              type="number"
+              value={customSettings.bombs}
+              onChange={(e) =>
+                setCustomSettings((prev) => ({ ...prev, bombs: Number(e.target.value) }))
+              }
+            />
+          </div>
+          {/* カスタム設定でゲームを開始するためのボタン */}
+          <button onClick={resetHandler}>この設定で開始</button>
+        </div>
+      )}
       <div
         className={styles.flame}
         style={{
@@ -280,14 +325,14 @@ export default function Home() {
         <div
           className={styles.horizontalFlame}
           style={{
-            width: initialSettings.width * 30,
+            width: settings.width * 30,
           }}
         />
         <div
           className={styles.board}
           style={{
-            width: initialSettings.width * 30 + 8,
-            height: initialSettings.height * 30 + 8,
+            width: settings.width * 30 + 8,
+            height: settings.height * 30 + 8,
           }}
         >
           {calcBoard.map((row, y) =>

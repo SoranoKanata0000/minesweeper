@@ -114,3 +114,8 @@
   background-color: #999;
   border: 1px solid #000;
 }
+
+.customSettings {
+  width: 278px;
+  height: 25px;
+}
