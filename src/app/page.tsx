@@ -8,7 +8,7 @@ export default function Home() {
     easy: { width: 9, height: 9, bombs: 10 },
     medium: { width: 16, height: 16, bombs: 40 },
     hard: { width: 30, height: 16, bombs: 99 },
-    custom: { width: 9, height: 9, bombs: 10 },
+    custom: { width: 10, height: 10, bombs: 15 },
   };
 
   type Difficulty = keyof typeof difficultySettings;
@@ -223,14 +223,11 @@ export default function Home() {
     setUserInputs(newUserInputs);
   };
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
-    const newSettings = difficultySettings[newDifficulty];
-    const newBoard = createBoard(newSettings.height, newSettings.width);
-
     setDifficulty(newDifficulty);
-    setUserInputs(newBoard);
-    setBombMap(newBoard);
-    setGameStatus('ready');
-    setTime(0);
+    if (newDifficulty === 'custom') {
+      return;
+    }
+    resetHandler();
   };
   const resetHandler = () => {
     const currentSettings = difficulty === 'custom' ? customSettings : settings;
@@ -283,20 +280,20 @@ export default function Home() {
             />
           </div>
           {/* カスタム設定でゲームを開始するためのボタン */}
-          <button onClick={resetHandler}>この設定で開始</button>
+          <button onClick={() => resetHandler()}>この設定で開始</button>
         </div>
       )}
       <div
         className={styles.flame}
         style={{
-          width: initialSettings.width * 30 + 36,
-          height: initialSettings.height * 30 + 112,
+          width: settings.width * 30 + 36,
+          height: settings.height * 30 + 112,
         }}
       >
         <div
           className={styles.info}
           style={{
-            width: initialSettings.width * 30 + 8,
+            width: settings.width * 30 + 8,
             padding: `10px`,
           }}
         >
