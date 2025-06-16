@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -63,6 +63,11 @@ export default function Home() {
     [1, 0],
     [1, 1],
   ];
+
+  const customHeightRef = useRef<HTMLInputElement>(null);
+  const customWidthRef = useRef<HTMLInputElement>(null);
+  const customBombsRef = useRef<HTMLInputElement>(null);
+
   const makeBombRandom = (x: number, y: number, bombs: number): number[][] => {
     const currentSettings = settings;
     const newBombMap = createBoard(currentSettings.height, currentSettings.width);
@@ -180,7 +185,6 @@ export default function Home() {
     bombMap: number[][],
   ): 'cleared' | 'gameOver' | 'playing' => {
     const isGameOver = newInputs.flat().some((input, i) => input === 1 && bombMap.flat()[i] === 11);
-    console.log(isGameOver);
 
     if (isGameOver) {
       return 'gameOver';
@@ -224,15 +228,34 @@ export default function Home() {
   };
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
     setDifficulty(newDifficulty);
-    if (newDifficulty === 'custom') {
-      return;
-    }
-    resetHandler();
+    const newSettings = difficultySettings[newDifficulty];
+    resetBoard(newSettings);
   };
   const resetHandler = () => {
-    const currentSettings = difficulty === 'custom' ? customSettings : settings;
-    const newBoard = createBoard(currentSettings.height, currentSettings.width);
+    console.log('reset');
+    let settingsToUse = difficultySettings[difficulty];
 
+    // 難易度が'custom'の場合のみ、refから値を取得して設定を上書きする
+    if (difficulty === 'custom') {
+      // ref.currentがnullでないことを確認
+      if (customHeightRef.current && customWidthRef.current && customBombsRef.current) {
+        const height = Number(customHeightRef.current.value);
+        const width = Number(customWidthRef.current.value);
+        const bombs = Number(customBombsRef.current.value);
+
+        // 入力された値でカスタム設定を作成
+        settingsToUse = { height, width, bombs };
+
+        // (任意) 次回のためにcustomSettings stateも更新しておく
+        setCustomSettings(settingsToUse);
+      }
+    }
+
+    resetBoard(settingsToUse);
+  };
+
+  const resetBoard = (settings: { height: number; width: number; bombs: number }) => {
+    const newBoard = createBoard(settings.height, settings.width);
     setUserInputs(newBoard);
     setBombMap(newBoard);
     setGameStatus('ready');
@@ -251,36 +274,18 @@ export default function Home() {
         <div className={styles.customSettings}>
           <div>
             <label>高さ:</label>
-            <input
-              type="number"
-              value={customSettings.height}
-              onChange={(e) =>
-                setCustomSettings((prev) => ({ ...prev, height: Number(e.target.value) }))
-              }
-            />
+            <input type="number" ref={customHeightRef} defaultValue={customSettings.height} />
           </div>
           <div>
             <label>幅:</label>
-            <input
-              type="number"
-              value={customSettings.width}
-              onChange={(e) =>
-                setCustomSettings((prev) => ({ ...prev, width: Number(e.target.value) }))
-              }
-            />
+            <input type="number" ref={customWidthRef} defaultValue={customSettings.width} />
           </div>
           <div>
             <label>爆弾:</label>
-            <input
-              type="number"
-              value={customSettings.bombs}
-              onChange={(e) =>
-                setCustomSettings((prev) => ({ ...prev, bombs: Number(e.target.value) }))
-              }
-            />
+            <input type="number" ref={customBombsRef} defaultValue={customSettings.bombs} />
           </div>
           {/* カスタム設定でゲームを開始するためのボタン */}
-          <button onClick={() => resetHandler()}>この設定で開始</button>
+          <button onClick={resetHandler}>この設定で開始</button>
         </div>
       )}
       <div
