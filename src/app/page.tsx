@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import DigitalDisplay from './DigitalDisplay';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -285,7 +286,7 @@ export default function Home() {
             <input type="number" ref={customBombsRef} defaultValue={customSettings.bombs} />
           </div>
           {/* カスタム設定でゲームを開始するためのボタン */}
-          <button onClick={resetHandler}>この設定で開始</button>
+          <button onClick={resetHandler}>開始</button>
         </div>
       )}
       <div
@@ -302,7 +303,7 @@ export default function Home() {
             padding: `10px`,
           }}
         >
-          <div className={styles.flagCounter}>{bombsRemaining}</div>
+          <DigitalDisplay number={bombsRemaining} />
 
           <button
             className={styles.infoButton}
@@ -321,8 +322,7 @@ export default function Home() {
             }}
             onClick={() => resetHandler()}
           />
-
-          <div className={styles.timer}>{time}</div>
+          <DigitalDisplay number={time} />
         </div>
         <div
           className={styles.horizontalFlame}

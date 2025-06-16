@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 0.5rem;
-  overflow-y: auto;
 }
 
 .sampleCell {
@@ -47,6 +46,7 @@
   justify-content: center;
   width: 62px;
   height: 42px;
+  background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
   background-color: aquamarine;
   border: 3px inset #aaa;
 }
@@ -81,6 +81,7 @@
   justify-content: center;
   width: 62px;
   height: 42px;
+  background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
   background-color: aquamarine;
   border: 3px inset #aaa;
 }
@@ -117,4 +118,18 @@
 .customSettings {
   width: auto;
   height: auto;
+}
+
+.displayContainer {
+  display: flex; /* 数字を横並びにする */
+  padding: 4px;
+  background-color: #333; /* デジタル数字らしい黒い背景 */
+  border: 2px inset #aaa;
+}
+
+.digit {
+  width: 21px; /* デジタル数字1個分の画像の幅 */
+  height: 39px; /* デジタル数字1個分の画像の高さ */
+  background-image: url('/assets/images/minesweeperDezitalNumber.png'); /* publicフォルダからのパス */
+  background-repeat: no-repeat;
 }
