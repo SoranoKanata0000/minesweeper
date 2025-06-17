@@ -41,7 +41,6 @@ export default function Home() {
   const [time, setTime] = useState(0);
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
-    // gameStatus が 'playing' の間だけタイマーを動かす
     if (gameStatus === 'playing') {
       timerId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
@@ -112,7 +111,7 @@ export default function Home() {
       const currentSettings = settings;
       const newBombMap = makeBombRandom(x, y, currentSettings.bombs);
       currentBombMap = newBombMap;
-      setGameStatus('playing'); // ゲーム状態を 'playing' に更新
+      setGameStatus('playing');
     }
     console.log(currentBombMap);
 
@@ -142,6 +141,17 @@ export default function Home() {
     if (newGameStatus === 'cleared') {
       alert('Game Clear!');
       setGameStatus('cleared');
+      const finalBoard = newUserInputs.map((row, y) =>
+        row.map((userInput, x) => {
+          if (currentBombMap[y][x] === 11) {
+            return 8;
+          }
+          return userInput;
+        }),
+      );
+
+      setUserInputs(finalBoard);
+      return;
     }
   };
   const findBomb = (
@@ -153,7 +163,6 @@ export default function Home() {
     const newUserInputs = structuredClone(currentUserInputs);
 
     const openAdjacentCells = (cy: number, cx: number) => {
-      // 範囲外または既に開いているマスは処理しない
       if (
         cy < 0 ||
         cy >= newUserInputs.length ||
@@ -166,12 +175,10 @@ export default function Home() {
 
       newUserInputs[cy][cx] = 1; // マスを開く
 
-      // 開いたマスが0でなければ、そこで再帰を止める
       if (currentBombMap[cy][cx] !== 0) {
         return;
       }
 
-      // 0のマスなら、周囲のマスに対して再帰的に処理を行う
       for (const d of directions) {
         openAdjacentCells(cy + d[0], cx + d[1]);
       }
@@ -190,12 +197,9 @@ export default function Home() {
       return 'gameOver';
     }
 
-    // 開かれていないマスの数を数える
     const unopenedCells = newInputs.flat().filter((input) => input !== 1).length;
     const currentBombCount = settings.bombs;
-    // 開かれていないマスの数と爆弾の数が同じならゲームクリア
     if (unopenedCells === currentBombCount) {
-      // 10は爆弾の数
       return 'cleared';
     }
 
@@ -235,18 +239,14 @@ export default function Home() {
     console.log('reset');
     let settingsToUse = difficultySettings[difficulty];
 
-    // 難易度が'custom'の場合のみ、refから値を取得して設定を上書きする
     if (difficulty === 'custom') {
-      // ref.currentがnullでないことを確認
       if (customHeightRef.current && customWidthRef.current && customBombsRef.current) {
         const height = Number(customHeightRef.current.value);
         const width = Number(customWidthRef.current.value);
         const bombs = Number(customBombsRef.current.value);
 
-        // 入力された値でカスタム設定を作成
         settingsToUse = { height, width, bombs };
 
-        // (任意) 次回のためにcustomSettings stateも更新しておく
         setCustomSettings(settingsToUse);
       }
     }
@@ -284,7 +284,6 @@ export default function Home() {
             <label>爆弾:</label>
             <input type="number" ref={customBombsRef} defaultValue={customSettings.bombs} />
           </div>
-          {/* カスタム設定でゲームを開始するためのボタン */}
           <button onClick={resetHandler}>開始</button>
         </div>
       )}
@@ -375,20 +374,13 @@ export default function Home() {
                     backgroundPosition: (() => {
                       if (bombMap[y][x] === -1) {
                         return `-300px`;
-                      }
-                      // userInputの値に応じて表示を切り替える
-                      else if (userInput === 1) {
-                        // 1: 開封済み
-                        // bombValueを使って数字の画像位置を決める
+                      } else if (userInput === 1) {
                         return `${(bombValue - 1) * -30}px`;
                       } else if (userInput === 8) {
-                        // 8: 旗
                         return '-207px';
                       } else if (userInput === 7) {
-                        // 7: ？
                         return '-185px';
                       }
-                      // 0: 未開封
                       return '30px';
                     })(),
                     backgroundColor:
