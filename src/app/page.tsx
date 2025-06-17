@@ -304,9 +304,9 @@ export default function Home() {
         >
           <div className={styles.flagCounter}>
             {[
-              bombsRemaining / 100 > 0 ? Math.floor(bombsRemaining / 100) * -27.5 : 0,
-              bombsRemaining / 10 > 0 ? Math.floor((bombsRemaining % 100) / 10) * -27.5 : 0,
-              bombsRemaining % 10 > 0 ? (bombsRemaining % 10) * -27.5 : 0,
+              bombsRemaining / 100 > 0 ? Math.floor(bombsRemaining / 100) * -19 : 0,
+              bombsRemaining / 10 > 0 ? Math.floor((bombsRemaining % 100) / 10) * -19 : 0,
+              bombsRemaining % 10 > 0 ? (bombsRemaining % 10) * -19 : 0,
             ].map((m, i) => (
               <div
                 key={`${i}-${m}`}
@@ -332,7 +332,19 @@ export default function Home() {
             }}
             onClick={() => resetHandler()}
           />
-          <div className={styles.timer}>{time}</div>
+          <div className={styles.timer}>
+            {[
+              time / 100 > 0 ? Math.floor(time / 100) * -19 : 0,
+              time / 10 > 0 ? Math.floor((time % 100) / 10) * -19 : 0,
+              time % 10 > 0 ? (time % 10) * -19 : 0,
+            ].map((m, i) => (
+              <div
+                key={`${i}-${m}`}
+                className={styles.degitalNumber}
+                style={{ backgroundPositionX: `${m}px` }}
+              />
+            ))}
+          </div>
         </div>
         <div
           className={styles.horizontalFlame}

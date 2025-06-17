@@ -46,9 +46,6 @@
   justify-content: center;
   width: 63px; /* 57 */
   height: 42px; /* 36 */
-  background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
-  background-color: #333;
-  background-size: auto 100%;
   border: 3px inset #aaa;
 }
 
@@ -56,6 +53,8 @@
   width: 19px;
   height: 36px;
   background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: 190px 36px;
 }
 
 .space {
