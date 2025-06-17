@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import DigitalDisplay from './DigitalDisplay';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -303,8 +302,19 @@ export default function Home() {
             padding: `10px`,
           }}
         >
-          <DigitalDisplay number={bombsRemaining} />
-
+          <div className={styles.flagCounter}>
+            {[
+              bombsRemaining / 100 > 0 ? Math.floor(bombsRemaining / 100) * -27.5 : 0,
+              bombsRemaining / 10 > 0 ? Math.floor((bombsRemaining % 100) / 10) * -27.5 : 0,
+              bombsRemaining % 10 > 0 ? (bombsRemaining % 10) * -27.5 : 0,
+            ].map((m, i) => (
+              <div
+                key={`${i}-${m}`}
+                className={styles.degitalNumber}
+                style={{ backgroundPositionX: `${m}px` }}
+              />
+            ))}
+          </div>
           <button
             className={styles.infoButton}
             style={{
@@ -322,7 +332,7 @@ export default function Home() {
             }}
             onClick={() => resetHandler()}
           />
-          <DigitalDisplay number={time} />
+          <div className={styles.timer}>{time}</div>
         </div>
         <div
           className={styles.horizontalFlame}

@@ -44,11 +44,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 62px;
-  height: 42px;
+  width: 63px; /* 57 */
+  height: 42px; /* 36 */
   background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
-  background-color: aquamarine;
+  background-color: #333;
+  background-size: auto 100%;
   border: 3px inset #aaa;
+}
+
+.degitalNumber {
+  width: 19px;
+  height: 36px;
+  background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
 }
 
 .space {
@@ -83,6 +90,7 @@
   height: 42px;
   background: url('~/src/assets/images/minesweeperDezitalNumber.png') no-repeat;
   background-color: aquamarine;
+  background-size: auto 100%;
   border: 3px inset #aaa;
 }
 
@@ -124,6 +132,7 @@
   display: flex; /* 数字を横並びにする */
   padding: 4px;
   background-color: #333; /* デジタル数字らしい黒い背景 */
+  background-size: auto 100%;
   border: 2px inset #aaa;
 }
 
@@ -132,4 +141,5 @@
   height: 39px; /* デジタル数字1個分の画像の高さ */
   background-image: url('/assets/images/minesweeperDezitalNumber.png'); /* publicフォルダからのパス */
   background-repeat: no-repeat;
+  background-size: 231px 39px;
 }
