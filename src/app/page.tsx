@@ -222,7 +222,6 @@ export default function Home() {
     if (gameStatus === 'cleared' || gameStatus === 'gameOver') {
       return;
     }
-    //右クリック onContextMenu
     const newUserInputs = structuredClone(userInputs);
     const currentStatus = newUserInputs[y][x];
 
@@ -243,10 +242,13 @@ export default function Home() {
       if (customHeightRef.current && customWidthRef.current && customBombsRef.current) {
         const height = Number(customHeightRef.current.value);
         const width = Number(customWidthRef.current.value);
-        const bombs = Number(customBombsRef.current.value);
+        const bombs =
+          (Number(customBombsRef.current.value) / (height * width)) * 100 <= 38
+            ? Number(customBombsRef.current.value)
+            : Number(height * width * 0.38);
 
         settingsToUse = { height, width, bombs };
-
+        customBombsRef.current.value = String(height * width * 0.38);
         setCustomSettings(settingsToUse);
       }
     }
