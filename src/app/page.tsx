@@ -248,7 +248,7 @@ export default function Home() {
             : Number(Math.floor(height * width * 0.38));
 
         settingsToUse = { height, width, bombs };
-        customBombsRef.current.value = String(Math.floor(height * width * 0.38));
+        customBombsRef.current.value = String(bombs);
         setCustomSettings(settingsToUse);
       }
     }
