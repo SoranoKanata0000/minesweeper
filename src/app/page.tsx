@@ -1,16 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { difficultySettings, directions, nextStateMap } from './constants';
 import styles from './page.module.css';
 
 export default function Home() {
-  const difficultySettings = {
-    easy: { width: 9, height: 9, bombs: 10 },
-    medium: { width: 16, height: 16, bombs: 40 },
-    hard: { width: 30, height: 16, bombs: 99 },
-    custom: { width: 10, height: 10, bombs: 15 },
-  };
-
   type Difficulty = keyof typeof difficultySettings;
 
   const createBoard = (height: number, width: number): number[][] => {
@@ -52,16 +46,6 @@ export default function Home() {
       }
     };
   }, [gameStatus]);
-  const directions = [
-    [-1, -1],
-    [-1, 0],
-    [-1, 1],
-    [0, -1],
-    [0, 1],
-    [1, -1],
-    [1, 0],
-    [1, 1],
-  ];
 
   const customHeightRef = useRef<HTMLInputElement>(null);
   const customWidthRef = useRef<HTMLInputElement>(null);
@@ -209,12 +193,6 @@ export default function Home() {
 
   const flagsPlaced = userInputs.flat().filter((userInput) => userInput === 8).length;
   const bombsRemaining = settings.bombs - flagsPlaced;
-
-  const nextStateMap: { [key: number]: number } = {
-    0: 8, // 未開封(0) -> 旗(2)
-    8: 7, // 旗(2) -> ？(3)
-    7: 0, // ？(3) -> 未開封(0)
-  };
 
   const flagAndQuestion = (y: number, x: number, evt: React.MouseEvent<HTMLDivElement>) => {
     evt.preventDefault();
