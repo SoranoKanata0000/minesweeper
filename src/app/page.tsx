@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { difficultySettings, directions, nextStateMap } from './constants';
+import { difficultySettings, directions, nextStateMap } from './components/constants';
 import styles from './page.module.css';
 
 export default function Home() {
